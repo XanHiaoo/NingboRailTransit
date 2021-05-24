@@ -6,36 +6,91 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from PyQt5. QtWidgets import *
+from PyQt5.QtWidgets import (QWidget, QGridLayout,
+                             QPushButton, QApplication, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QInputDialog)
 from PyQt5.QtGui import QIcon
 import sys
 from utils import *
-
-class mainwindow(QMainWindow):
+import beautify
+class mainwindow(QWidget):
     def __init__(self):
-        super(mainwindow,self).__init__()
+        super().__init__()
+
         self.initUI()
     def initUI(self):
-        self.setFixedSize(960, 700)
-        self.main_widget = QtWidgets.QWidget()  # 创建窗口主部件
-        self.main_layout = QtWidgets.QGridLayout()  # 创建主部件的网格布局
-        self.main_widget.setLayout(self.main_layout)  # 设置窗口主部件布局为网格布局
-
-
-        self.main_layout.addWidget(self.left_widget, 0, 0, 12, 2)  # 左侧部件在第0行第0列，占8行3列
-        self.main_layout.addWidget(self.right_widget, 0, 2, 12, 10)  # 右侧部件在第0行第3列，占8行9列
-        self.setCentralWidget(self.main_widget)  # 设置窗口主部件
-        self.setWindowTitle('宁波轨道交通查询乘车系统')
+        self.setWindowTitle('宁波轨道交通')
         self.setWindowIcon(QIcon('yong.jpg'))
-        self.centralwidget.setObjectName("centralwidget")
-        self.lbltitle = QtWidgets.QLabel(self.centralwidget)
-        # _translate = QtCore.QCoreApplication.translate
-        # self.label.setText(_translate("MainWindow", "宁波轨道交通乘车查询系统"))
+        self.resize(600,600)
+
+        # 全局控件（注意参数self），用于承载全局布局
+        wwg = QWidget(self)
+        wlayout = QVBoxLayout(wwg)# 全局布局（注意参数wwg）
+
+        vlayout1 = QHBoxLayout()#局部垂直布局1
+        grid = QGridLayout()#局部网格布局
+        vlayout2 = QHBoxLayout()  # 局部垂直布局2
+
+        titlelabel=QLabel("宁波轨道交通查询乘车系统")
+        # m_Pixmap = QPixmap("yong.jpg")
+        # titlelabel.setPixmap(m_Pixmap)
+
+        # 为局部布局添加控件
+        vlayout1.addStretch(1)
+        vlayout1.addWidget(titlelabel)
+        vlayout1.addStretch(1)
+
+        button_station=QPushButton("站点查询")
+        button_station.setStyleSheet(beautify.qss)
+        button_line=QPushButton("线路查询")
+        button_line.setStyleSheet(beautify.qss)
+        button_navi=QPushButton("导航查询")
+        button_navi.setStyleSheet(beautify.qss)
+        button_cardgenerate=QPushButton("公交卡办理")
+        button_cardgenerate.setStyleSheet(beautify.qss)
+        button_cardquery=QPushButton("公交卡充值")
+        button_cardquery.setStyleSheet(beautify.qss)
+        button_cardgo=QPushButton("公交卡乘车")
+        button_cardgo.setStyleSheet(beautify.qss)
+        grid.addWidget(button_station, 0,0)
+        grid.addWidget(button_line, 1, 0)
+        grid.addWidget(button_navi, 2, 0)
+        grid.addWidget(button_cardgenerate, 0, 1)
+        grid.addWidget(button_cardquery, 1, 1)
+        grid.addWidget(button_cardgo, 2, 1)
+
+        answerlabel=QLabel("...")
+        answerlabel.resize(200, 100)
+        vlayout2.addStretch(1)
+        vlayout2.addWidget(answerlabel)
+        vlayout2.addStretch(1)
+
+
+        # 在局部布局中添加控件，然后将其添加到全局布局中
+        wlayout.addLayout(vlayout1)
+        wlayout.addLayout(grid)
+        wlayout.addLayout(vlayout2)
+
+        self.setLayout(wlayout)#写这句保持相对布局
+        button_station.clicked.connect(lambda:self.getstation(answerlabel))
+        button_line.clicked.connect(lambda:self.getline(answerlabel))
+        # button_navi.clicked.connect(self.getstation)
+        # button_cardgenerate.clicked.connect(self.getstation)
+        # button_cardquery.clicked.connect(self.getstation)
+        # button_cardgo.clicked.connect(self.getstation)
+        self.show()
+    def getstation(self,label):
+        txt, ok = QInputDialog.getText(self, '输入框', '输入查询站点')
+        if ok and txt:
+            l = Station_inquiry(txt)
+            label.setText('通过'+txt+'的轨道交通线有:\n'+l)
+    def getline(self,label):
+        txt, ok = QInputDialog.getText(self, '输入框', '输入查询路线')
+        if ok and txt:
+            l = Line_inquiry(int(txt))
+            s = strline(l)
+            label.setText('轨道交通' + txt + '号线站点:\n' + s)
 
 if __name__ == '__main__':
-    #创建应用程序和对象
     app = QApplication(sys.argv)
     ex = mainwindow()
-    ex.initUI()
-    ex.show()
     sys.exit(app.exec_())

@@ -11,6 +11,40 @@ from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5. QtWidgets import *
 from utils import *
+import beautify
+
+
+class childwindow(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle('&路线导航')
+        self.resize(300, 200)
+        startlabel = QLabel('&起始站', self)
+        startline = QLineEdit(self)
+        startlabel.setBuddy(startline)
+
+        endlabel = QLabel('&终点站', self)
+        endline = QLineEdit(self)
+        endlabel.setBuddy(endline)
+
+        btnstrat = QPushButton('&导航')
+        btnCancel = QPushButton('&取消')
+        btnstrat.setStyleSheet(beautify.qss)
+        btnCancel.setStyleSheet(beautify.qss)
+        mainLayout = QGridLayout(self)
+        mainLayout.addWidget(startlabel, 0, 0)
+        mainLayout.addWidget(startline, 0, 1, 1, 2)
+
+        mainLayout.addWidget(endlabel, 1, 0)
+        mainLayout.addWidget(endline, 1, 1, 1, 2)
+
+        mainLayout.addWidget(btnstrat, 2, 1)
+        mainLayout.addWidget(btnCancel, 2, 2)
+
+
 
 class Ui_MainWindow(QMainWindow):
     def setupUi(self, MainWindow):
@@ -293,19 +327,13 @@ class Ui_MainWindow(QMainWindow):
             l = Line_inquiry(int(txt))
             s=strline(l)
             self.textBrowser.setText('轨道交通' + txt + '号线站点:\n' + s)
-    def getlnavi(self):
-        txt1, ok = QInputDialog.getText(self, '输入框', '起始站')
+    # def getlnavi(self):
+    #     txt1, ok = QInputDialog.getText(self, '输入框', '起始站')
 
     def command(self):
-        self.console = Console(self)
-        self.console.setWindowTitle('路线导航')
-        self.console.resize(300,200)
-        startlineedit=QLineEdit()
-        endlineedit = QLineEdit()
-        self.pushButton_start=QPushButton('导航')
+        self.console = childwindow()
         self.console.show()
+        self.console.exec_()
 
 
-class Console(QMainWindow):
-    def __init__(self, parent=None):
-        super(Console, self).__init__(parent)
+

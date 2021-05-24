@@ -7,6 +7,7 @@ import PyQt5
 # cursor.execute("select Station.StationName from Rail inner join Station on Rail.StationId=Station.StationId where LineId=1")
 # for row in cursor:
 #     print(row)
+
 def sqllink():
     cnxn_str = ('Driver={SQL Server};'
                 'Server=LAPTOP-HBNPGUI2;'
