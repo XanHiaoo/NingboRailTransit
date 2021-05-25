@@ -31,6 +31,7 @@ def Station_inquiry(station):
             return l
     else:
         return '没有这个站'
+
 def Line_inquiry(line):
     l={}
     cnxn = sqllink()

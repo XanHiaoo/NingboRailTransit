@@ -18,8 +18,8 @@ class childwindow(QDialog):
         self.initUI()
 
     def initUI(self):
-        self.setWindowTitle('&路线导航')
-        self.resize(300, 200)
+        self.setWindowTitle('路线导航')
+        self.resize(600,600)
         startlabel = QLabel('&起始站', self)
         startline = QLineEdit(self)
         startlabel.setBuddy(startline)
@@ -32,6 +32,7 @@ class childwindow(QDialog):
         btnCancel = QPushButton('&取消')
         btnstrat.setStyleSheet(beautify.qss)
         btnCancel.setStyleSheet(beautify.qss)
+        ansewerlabel=QLabel("   ...")
         mainLayout = QGridLayout(self)
         mainLayout.addWidget(startlabel, 0, 0)
         mainLayout.addWidget(startline, 0, 1, 1, 2)
@@ -42,11 +43,14 @@ class childwindow(QDialog):
         mainLayout.addWidget(btnstrat, 2, 1)
         mainLayout.addWidget(btnCancel, 2, 2)
 
-        btnstrat.clicked.connect(lambda:self.start(startline,endline))
-    def start(self,startline,endline):
+        mainLayout.addWidget(ansewerlabel,3,0)
+
+        btnstrat.clicked.connect(lambda:self.start(startline,endline,ansewerlabel))
+    def start(self,startline,endline,answerlabel):
         starts=startline.text()
         ends=endline.text()
-        Navigation(starts, ends)
+        navi=Navigation(starts, ends)
+        answerlabel.setText("1")
 
 class mainwindow(QWidget):
     def __init__(self):
@@ -88,7 +92,7 @@ class mainwindow(QWidget):
         button_cardquery.setStyleSheet(beautify.buttonstyle1)
         button_cardgo=QPushButton("      公交卡乘车      ")
         button_cardgo.setStyleSheet(beautify.buttonstyle1)
-        grid.addWidget(QLabel(), 0, 0)
+        # grid.addWidget(QLabel(), 0, 0)
         grid.addWidget(button_station, 0,1)
         grid.addWidget(button_line, 1, 1)
         grid.addWidget(button_navi, 2, 1)
@@ -96,7 +100,7 @@ class mainwindow(QWidget):
         grid.addWidget(button_cardgenerate, 0, 3)
         grid.addWidget(button_cardquery, 1, 3)
         grid.addWidget(button_cardgo, 2, 3)
-        grid.addWidget(QLabel(), 0, 4)
+        # grid.addWidget(QLabel(), 0, 4)
 
         answerlabel=QLabel("   ...")
         answerlabel.setWordWrap(True)#label实现自动换行
@@ -109,13 +113,15 @@ class mainwindow(QWidget):
 
         # 在局部布局中添加控件，然后将其添加到全局布局中
         wlayout.addLayout(vlayout1)
+        wlayout.addStretch(1)
         wlayout.addLayout(grid)
+        wlayout.addStretch(1)
         wlayout.addLayout(vlayout2)
 
         self.setLayout(wlayout)#写这句保持相对布局
         button_station.clicked.connect(lambda:self.getstation(answerlabel))
         button_line.clicked.connect(lambda:self.getline(answerlabel))
-        button_navi.clicked.connect(lambda:self.getnavi(answerlabel))
+        button_navi.clicked.connect(self.getnavi)
         # button_cardgenerate.clicked.connect(self.getstation)
         # button_cardquery.clicked.connect(self.getstation)
         # button_cardgo.clicked.connect(self.getstation)
@@ -125,16 +131,17 @@ class mainwindow(QWidget):
         if ok and txt:
             l = Station_inquiry(txt)
             label.setText('通过'+txt+'的轨道交通线有:\n'+l)
+
     def getline(self,label):
         txt, ok = QInputDialog.getText(self, '输入框', '输入查询路线')
         if ok and txt:
             l = Line_inquiry(int(txt))
             s = strline(l)
         label.setText('轨道交通' + txt + '号线站点:\n' + s)
-    def getnavi(self,label):
+
+    def getnavi(self):
         console = childwindow()
         console.show()
-
         console.exec_()
         # lable.setText("1")
 
