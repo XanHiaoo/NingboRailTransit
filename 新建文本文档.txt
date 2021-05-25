@@ -220,4 +220,4 @@ class Ui_MainWindow(QWidget):
             # txt=str(txt)
             l=utils.Station_inquiry(txt)
             self.lineEdit.setTxet(l)
-
+123
