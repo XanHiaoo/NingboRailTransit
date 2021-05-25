@@ -18,6 +18,8 @@ class mainwindow(QWidget):
 
         self.initUI()
     def initUI(self):
+
+        # self.setFixedSize(self.width(), self.height());#不能放大
         self.setWindowTitle('宁波轨道交通')
         self.setWindowIcon(QIcon('yong.jpg'))
         self.resize(600,600)
@@ -39,30 +41,35 @@ class mainwindow(QWidget):
         vlayout1.addWidget(titlelabel)
         vlayout1.addStretch(1)
 
-        button_station=QPushButton("站点查询")
-        button_station.setStyleSheet(beautify.qss)
-        button_line=QPushButton("线路查询")
-        button_line.setStyleSheet(beautify.qss)
-        button_navi=QPushButton("导航查询")
-        button_navi.setStyleSheet(beautify.qss)
-        button_cardgenerate=QPushButton("公交卡办理")
-        button_cardgenerate.setStyleSheet(beautify.qss)
-        button_cardquery=QPushButton("公交卡充值")
-        button_cardquery.setStyleSheet(beautify.qss)
-        button_cardgo=QPushButton("公交卡乘车")
-        button_cardgo.setStyleSheet(beautify.qss)
-        grid.addWidget(button_station, 0,0)
-        grid.addWidget(button_line, 1, 0)
-        grid.addWidget(button_navi, 2, 0)
-        grid.addWidget(button_cardgenerate, 0, 1)
-        grid.addWidget(button_cardquery, 1, 1)
-        grid.addWidget(button_cardgo, 2, 1)
+        button_station=QPushButton("       站点查询       ")
+        button_station.setStyleSheet(beautify.buttonstyle1)
+        button_line=QPushButton("       线路查询       ")
+        button_line.setStyleSheet(beautify.buttonstyle1)
+        button_navi=QPushButton("       导航查询       ")
+        button_navi.setStyleSheet(beautify.buttonstyle1)
+        button_cardgenerate=QPushButton("      公交卡办理      ")
+        button_cardgenerate.setStyleSheet(beautify.buttonstyle1)
+        button_cardquery=QPushButton("      公交卡充值      ")
+        button_cardquery.setStyleSheet(beautify.buttonstyle1)
+        button_cardgo=QPushButton("      公交卡乘车      ")
+        button_cardgo.setStyleSheet(beautify.buttonstyle1)
+        grid.addWidget(QLabel(), 0, 0)
+        grid.addWidget(button_station, 0,1)
+        grid.addWidget(button_line, 1, 1)
+        grid.addWidget(button_navi, 2, 1)
+        grid.addWidget(QLabel(), 0, 2)
+        grid.addWidget(button_cardgenerate, 0, 3)
+        grid.addWidget(button_cardquery, 1, 3)
+        grid.addWidget(button_cardgo, 2, 3)
+        grid.addWidget(QLabel(), 0, 4)
 
-        answerlabel=QLabel("...")
+        answerlabel=QLabel("   ...")
+        answerlabel.setWordWrap(True)#label实现自动换行
+        # answerlabel.setAlignment(QtCore.Qt.AlignTop)
         answerlabel.resize(200, 100)
-        vlayout2.addStretch(1)
+        # vlayout2.addStretch(1)
         vlayout2.addWidget(answerlabel)
-        vlayout2.addStretch(1)
+        # vlayout2.addStretch(1)
 
 
         # 在局部布局中添加控件，然后将其添加到全局布局中
@@ -84,11 +91,12 @@ class mainwindow(QWidget):
             l = Station_inquiry(txt)
             label.setText('通过'+txt+'的轨道交通线有:\n'+l)
     def getline(self,label):
-        txt, ok = QInputDialog.getText(self, '输入框', '输入查询路线')
-        if ok and txt:
-            l = Line_inquiry(int(txt))
-            s = strline(l)
-            label.setText('轨道交通' + txt + '号线站点:\n' + s)
+        # txt, ok = QInputDialog.getText(self, '输入框', '输入查询路线')
+        # if ok and txt:
+        #     l = Line_inquiry(int(txt))
+        #     s = strline(l)
+        # label.setText('轨道交通' + txt + '号线站点:\n' + s)
+        label.setText("方可非覅违法iiwe0fiwe-fweif-weowe-fowwfeiefei0菲菲0覅欸发而非菲菲肥胖【fie-pfe-【fowf-【ewoif-ofewfowof=喂佛问我佛问佛微服务欧唯佛网 -eof-owf-w欧文 ")
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
