@@ -6,6 +6,4 @@
 from utils import *
 # l=Station_inquiry('慈城')
 # print(l)
-l=Line_inquiry(4)
-s=strline(l)
-print(s)
+Navigation('儿童公园', '鼓楼')
