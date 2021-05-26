@@ -32,25 +32,27 @@ class childwindow(QDialog):
         btnCancel = QPushButton('&取消')
         btnstrat.setStyleSheet(beautify.qss)
         btnCancel.setStyleSheet(beautify.qss)
-        ansewerlabel=QLabel("   ...")
-        mainLayout = QGridLayout(self)
-        mainLayout.addWidget(startlabel, 0, 0)
-        mainLayout.addWidget(startline, 0, 1, 1, 2)
+        navilabel=QLabel("   ...")
+        navilabel.setWordWrap(True)
 
-        mainLayout.addWidget(endlabel, 1, 0)
-        mainLayout.addWidget(endline, 1, 1, 1, 2)
+        mainLayout = QGridLayout(self)
+        mainLayout.addWidget(startlabel, 0, 0,2,1)
+        mainLayout.addWidget(startline, 0, 1, 2, 2)
+
+        mainLayout.addWidget(endlabel, 1, 0,2,1)
+        mainLayout.addWidget(endline, 1, 1, 2, 2)
 
         mainLayout.addWidget(btnstrat, 2, 1)
         mainLayout.addWidget(btnCancel, 2, 2)
 
-        mainLayout.addWidget(ansewerlabel,3,0)
+        mainLayout.addWidget(navilabel,3,0,1,3)
 
-        btnstrat.clicked.connect(lambda:self.start(startline,endline,ansewerlabel))
+        btnstrat.clicked.connect(lambda:self.start(startline,endline,navilabel))
     def start(self,startline,endline,answerlabel):
         starts=startline.text()
         ends=endline.text()
-        navi=Navigation(starts, ends)
-        answerlabel.setText("1")
+        naviline=Navigation1(starts, ends)
+        answerlabel.setText(naviline)
 
 class mainwindow(QWidget):
     def __init__(self):
@@ -63,6 +65,13 @@ class mainwindow(QWidget):
         self.setWindowTitle('宁波轨道交通')
         self.setWindowIcon(QIcon('yong.jpg'))
         self.resize(600,600)
+        palette = QPalette()
+        pix = QtGui.QPixmap('line2.jpg')
+        pix = pix.scaled(self.width(), self.height())
+        palette.setBrush(QPalette.Background, QBrush(QPixmap(pix)))
+        self.setPalette(palette)
+        # self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
+        # self.setStyleSheet("background: transparent;")
 
         wwg = QWidget(self) # 全局控件（注意参数self），用于承载全局布局
         wlayout = QVBoxLayout(wwg)# 全局布局（注意参数wwg）
@@ -71,7 +80,8 @@ class mainwindow(QWidget):
         grid = QGridLayout()#局部网格布局
         vlayout2 = QHBoxLayout()  # 局部垂直布局2
 
-        titlelabel=QLabel("宁波轨道交通查询乘车系统")
+        titlelabel=QLabel("宁波轨道交通查询乘车系统\n     Ningbo Rail Transit")
+        titlelabel.setStyleSheet("QLabel{color:rgb(28,28,28,255);font-size:40px;font-weight:normal;font-family:Microsoft Yahei;}")
         # m_Pixmap = QPixmap("yong.jpg")
         # titlelabel.setPixmap(m_Pixmap)
 
@@ -96,7 +106,7 @@ class mainwindow(QWidget):
         grid.addWidget(button_station, 0,1)
         grid.addWidget(button_line, 1, 1)
         grid.addWidget(button_navi, 2, 1)
-        grid.addWidget(QLabel(), 0, 2)
+        # grid.addWidget(QLabel(), 0, 2)
         grid.addWidget(button_cardgenerate, 0, 3)
         grid.addWidget(button_cardquery, 1, 3)
         grid.addWidget(button_cardgo, 2, 3)
@@ -113,9 +123,9 @@ class mainwindow(QWidget):
 
         # 在局部布局中添加控件，然后将其添加到全局布局中
         wlayout.addLayout(vlayout1)
-        wlayout.addStretch(1)
+        # wlayout.addStretch(1)
         wlayout.addLayout(grid)
-        wlayout.addStretch(1)
+        # wlayout.addStretch(1)
         wlayout.addLayout(vlayout2)
 
         self.setLayout(wlayout)#写这句保持相对布局

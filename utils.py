@@ -92,36 +92,69 @@ def GoToWay(line,station1,station2):
             way.append(StationList[i])
     return way
 
-def Navigation(station1,station2):
-    print(station1+'到'+station2+'轨道交通路线：')
+# def Navigation(station1,station2):
+#     print(station1+'到'+station2+'轨道交通路线：')
+#     l1=GetLineId(station1)
+#     l2 = GetLineId(station2)
+#     for ll1 in l1:
+#         for ll2 in l2:
+#             if ll1==ll2:
+#                 way1 = GoToWay(ll1, station1, station2)
+#                 print("地铁" + str(ll1) + '号线:', end='')
+#                 for way in way1:
+#                     print('->' + way, end='')
+#                 print('(共{}站）'.format(len(way1)))
+#             else:
+#                 transferstation=GetTransfer(ll1,ll2)
+#                 for tfs in transferstation:
+#                     if(tfs!=station1):
+#                         way1 = GoToWay(ll1, station1, tfs)
+#                         print("地铁" + str(ll1) + '号线:', end='')
+#                         for way in way1:
+#                             print('->' + way, end='')
+#
+#                         print('(此站换乘)-> ', end='')
+#
+#                         way2 = GoToWay(ll2, tfs, station2)
+#                         print("地铁" + str(ll2) + '号线:', end='')
+#                         for i, way in enumerate(way2):
+#                             print('->' + way, end='')
+#                         print('  (共{}站）'.format(len(way1) + len(way2)))
+#
+#     print()
+
+def Navigation1(station1,station2):
+    naviline=''
+    naviline+=station1+'到'+station2+'轨道交通路线：\n'
     l1=GetLineId(station1)
     l2 = GetLineId(station2)
     for ll1 in l1:
         for ll2 in l2:
             if ll1==ll2:
                 way1 = GoToWay(ll1, station1, station2)
-                print("地铁" + str(ll1) + '号线:', end='')
+                naviline+="地铁" + str(ll1) + '号线:'
                 for way in way1:
-                    print('->' + way, end='')
-                print('(共{}站）'.format(len(way1)))
+                    naviline +='->' + way
+                naviline+='(共{}站）'.format(len(way1))+'\n'
             else:
                 transferstation=GetTransfer(ll1,ll2)
                 for tfs in transferstation:
-                    way1=GoToWay(ll1,station1,tfs)
-                    print("地铁"+str(ll1)+'号线:',end='')
-                    for way in way1:
-                        print('->'+way,end='')
-
-                    print('(此站换乘)-> ',end='')
-
+                    way1 = GoToWay(ll1, station1, tfs)
                     way2 = GoToWay(ll2, tfs, station2)
-                    print("地铁" + str(ll2) + '号线:', end='')
-                    for i,way in enumerate(way2):
-                            print('->'+way,end='')
-                    print('  (共{}站）'.format(len(way1)+len(way2)))
-    print()
+                    if(way1 and way2):
+                        naviline+=('地铁' + str(ll1) + '号线:')
+                        for way in way1:
+                            naviline+='->' + way
+
+                        naviline+='(此站换乘)-> '
+                        naviline += "地铁" + str(ll2) + '号线:'
+                        for i, way in enumerate(way2):
+                            naviline += '->' + way
+                        naviline += '  (共{}站）'.format(len(way1) + len(way2)) + '\n'
 
 
+
+    return naviline
 def pt(a):
     print(a)
 
