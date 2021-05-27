@@ -7,7 +7,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import (QWidget, QGridLayout,
-                             QPushButton, QApplication, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QInputDialog,QDialog,QLineEdit)
+                             QPushButton, QApplication, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QInputDialog,QDialog,QLineEdit,QComboBox)
 from PyQt5.QtGui import QIcon
 import sys
 from utils import *
@@ -20,39 +20,75 @@ class childwindow(QDialog):
     def initUI(self):
         self.setWindowTitle('路线导航')
         self.resize(600,600)
-        startlabel = QLabel('&起始站', self)
-        startline = QLineEdit(self)
-        startlabel.setBuddy(startline)
 
-        endlabel = QLabel('&终点站', self)
-        endline = QLineEdit(self)
-        endlabel.setBuddy(endline)
+        self.startcomboline = QComboBox()
+        self.endcomboline = QComboBox()
+        self.startcombosation = QComboBox()
+        self.endcombostation = QComboBox()
+
+        allline=getalllinename()#获得所有路线
+        for line in allline:
+            self.startcomboline.addItem(line)
+            self.endcomboline.addItem(line)
+
+        self.startcomboline.currentTextChanged.connect(self.updatestartcombosation1)
+        self.endcomboline.currentTextChanged.connect(self.updatestartcombosation2)
+
+        startlabel = QLabel('    &起始站:', self)
+        startlabel.setBuddy(self.startcomboline)
+        startlabel.setStyleSheet(beautify.labelstyle1)
+
+        endlabel = QLabel('    &终点站:', self)
+        endlabel.setBuddy(self.endcomboline)
+        endlabel.setStyleSheet(beautify.labelstyle1)
 
         btnstrat = QPushButton('&导航')
         btnCancel = QPushButton('&取消')
         btnstrat.setStyleSheet(beautify.qss)
         btnCancel.setStyleSheet(beautify.qss)
-        navilabel=QLabel("   ...")
-        navilabel.setWordWrap(True)
+        self.navilabel=QLabel("   ...")
+        self.navilabel.setWordWrap(True)
+        self.navilabel.setStyleSheet(beautify.labelstyle1)
 
         mainLayout = QGridLayout(self)
-        mainLayout.addWidget(startlabel, 0, 0,2,1)
-        mainLayout.addWidget(startline, 0, 1, 2, 2)
+        mainLayout.addWidget(startlabel, 0, 0)
+        mainLayout.addWidget(self.startcomboline, 0, 1 )
+        mainLayout.addWidget(self.startcombosation, 0, 2)
 
-        mainLayout.addWidget(endlabel, 1, 0,2,1)
-        mainLayout.addWidget(endline, 1, 1, 2, 2)
+        mainLayout.addWidget(endlabel, 1, 0)
+        mainLayout.addWidget(self.endcomboline, 1, 1)
+        mainLayout.addWidget(self.endcombostation, 1, 2)
 
         mainLayout.addWidget(btnstrat, 2, 1)
         mainLayout.addWidget(btnCancel, 2, 2)
 
-        mainLayout.addWidget(navilabel,3,0,1,3)
+        mainLayout.addWidget(self.navilabel,3,0,1,3)
 
-        btnstrat.clicked.connect(lambda:self.start(startline,endline,navilabel))
-    def start(self,startline,endline,answerlabel):
-        starts=startline.text()
-        ends=endline.text()
+        btnstrat.clicked.connect(self.start)
+    def start(self):
+        starts=self.startcombosation.currentText()
+        ends=self.endcombostation.currentText()
+        if(starts=='' or ends==''):
+            self.navilabel.setText("请同时选择起始站和终点站")
+            return
         naviline=Navigation1(starts, ends)
-        answerlabel.setText(naviline)
+        self.navilabel.setText(naviline)
+
+    def updatestartcombosation1(self):
+        self.startcombosation.clear()
+        s=self.startcomboline.currentText()
+        l = Line_inquiry(int(s[4]))
+        for i in range(0, len(l)):
+            self.startcombosation.addItem(l[i])
+
+    def updatestartcombosation2(self):
+        self.endcombostation.clear()
+        s=self.endcomboline.currentText()
+        l = Line_inquiry(int(s[4]))
+        for i in range(0, len(l)):
+            self.endcombostation.addItem(l[i])
+
+
 
 class mainwindow(QWidget):
     def __init__(self):
@@ -66,29 +102,37 @@ class mainwindow(QWidget):
         self.setWindowIcon(QIcon('yong.jpg'))
         self.resize(600,600)
         palette = QPalette()
-        pix = QtGui.QPixmap('line2.jpg')
+        pix = QtGui.QPixmap('line4.jpg')
         pix = pix.scaled(self.width(), self.height())
         palette.setBrush(QPalette.Background, QBrush(QPixmap(pix)))
         self.setPalette(palette)
-        # self.setAttribute(QtCore.Qt.WA_TranslucentBackground)
-        # self.setStyleSheet("background: transparent;")
+        # self.setWindowOpacity(0.8)
+
+        #设置图标
+        symbollbl = QLabel(self)
+        pixmap = QPixmap("biaozhi1.png")
+        pixmap = pixmap.scaled(100, 100)
+        symbollbl.setPixmap(pixmap)
 
         wwg = QWidget(self) # 全局控件（注意参数self），用于承载全局布局
         wlayout = QVBoxLayout(wwg)# 全局布局（注意参数wwg）
 
-        vlayout1 = QHBoxLayout()#局部垂直布局1
+        vlayout1 = QHBoxLayout()#局部水平布局1
         grid = QGridLayout()#局部网格布局
         vlayout2 = QHBoxLayout()  # 局部垂直布局2
 
         titlelabel=QLabel("宁波轨道交通查询乘车系统\n     Ningbo Rail Transit")
-        titlelabel.setStyleSheet("QLabel{color:rgb(28,28,28,255);font-size:40px;font-weight:normal;font-family:Microsoft Yahei;}")
+        titlelabel.setStyleSheet(beautify.labelstyle2)
         # m_Pixmap = QPixmap("yong.jpg")
         # titlelabel.setPixmap(m_Pixmap)
 
         # 为局部布局添加控件
         vlayout1.addStretch(1)
+        vlayout1.addWidget(symbollbl)
+        # vlayout1.addStretch(1)
         vlayout1.addWidget(titlelabel)
         vlayout1.addStretch(1)
+
 
         button_station=QPushButton("       站点查询       ")
         button_station.setStyleSheet(beautify.buttonstyle1)
