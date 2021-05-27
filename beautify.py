@@ -31,7 +31,7 @@ buttonstyle1='''
                      QPushButton
                      {
                      text-align : center;
-                     background-color : white;
+                     background: rgb(255,255,255,180);
                      font: bold;
                      border-color: gray;
                      border-width: 2px;
@@ -39,21 +39,23 @@ buttonstyle1='''
                      padding: 6px;
                      height : 14px;
                      border-style: outset;
-                     font : 14px;}
+                     font : 15px;}
                      QPushButton:hover{
                      font: bold;
                      border: 1px solid Gray;
-                     background:rgb(224, 238 ,224);
+                     background:rgb(202,225,255,80);
                     }
                     QPushButton:pressed{
                     font: bold;
                     border: 2px solid DarkGray;
-                    background:rgb(0, 255, 0, 30);
+                    background:rgb(202,225,255, 100);
                     }
 
 '''
 # font = QtGui.QFont()
 # font.setFamily('宋体')
+labelstyle1='background:rgb(255, 255 ,255,80);font: 25px;font-family:KaiTi'
+labelstyle2='QLabel{color:rgb(28,28,28,255);font-size:40px;font-weight:normal;font-family:Microsoft Yahei;}'
 
 
 
