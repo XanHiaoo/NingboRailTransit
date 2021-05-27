@@ -83,6 +83,25 @@ def GetLineId(station):
         l.append(row[0])
     return l
 
+def GetStationId(station):
+    cnxn = sqllink()
+    cursor = cnxn.cursor()
+    cursor.execute('''select StationId from Station
+                    where StationName=? ''', station)
+    for row in cursor:
+        s=row[0]
+    return s
+
+# 得到站点序号与站名dict
+def GetStationIdToName():
+    dict={}
+    cnxn = sqllink()
+    cursor = cnxn.cursor()
+    cursor.execute('''select StationId,StationName from Station''')
+    for row in cursor:
+        dict[row[0]]=row[1]
+    return dict
+
 # 得到换乘站
 def GetTransfer(l1,l2):
     transferstation = []
@@ -110,71 +129,123 @@ def GoToWay(line,station1,station2):
     return way
 
 # 导航+打印
-def Navigation(station1,station2):
-    print(station1+'到'+station2+'轨道交通路线：')
-    l1=GetLineId(station1)
-    l2 = GetLineId(station2)
-    for ll1 in l1:
-        for ll2 in l2:
-            if ll1==ll2:
-                way1 = GoToWay(ll1, station1, station2)
-                print("地铁" + str(ll1) + '号线:', end='')
-                for way in way1:
-                    print('->' + way, end='')
-                print('(共{}站）'.format(len(way1)))
-            else:
-                transferstation=GetTransfer(ll1,ll2)
-                for tfs in transferstation:
-                    if(tfs!=station1):
-                        way1 = GoToWay(ll1, station1, tfs)
-                        print("地铁" + str(ll1) + '号线:', end='')
-                        for way in way1:
-                            print('->' + way, end='')
-
-                        print('(此站换乘)-> ', end='')
-
-                        way2 = GoToWay(ll2, tfs, station2)
-                        print("地铁" + str(ll2) + '号线:', end='')
-                        for i, way in enumerate(way2):
-                            print('->' + way, end='')
-                        print('  (共{}站）'.format(len(way1) + len(way2)))
-
-    print()
+# def Navigation(station1,station2):
+#     print(station1+'到'+station2+'轨道交通路线：')
+#     l1=GetLineId(station1)
+#     l2 = GetLineId(station2)
+#     for ll1 in l1:
+#         for ll2 in l2:
+#             if ll1==ll2:
+#                 way1 = GoToWay(ll1, station1, station2)
+#                 print("地铁" + str(ll1) + '号线:', end='')
+#                 for way in way1:
+#                     print('->' + way, end='')
+#                 print('(共{}站）'.format(len(way1)))
+#             else:
+#                 transferstation=GetTransfer(ll1,ll2)
+#                 for tfs in transferstation:
+#                     if(tfs!=station1):
+#                         way1 = GoToWay(ll1, station1, tfs)
+#                         print("地铁" + str(ll1) + '号线:', end='')
+#                         for way in way1:
+#                             print('->' + way, end='')
+#
+#                         print('(此站换乘)-> ', end='')
+#
+#                         way2 = GoToWay(ll2, tfs, station2)
+#                         print("地铁" + str(ll2) + '号线:', end='')
+#                         for i, way in enumerate(way2):
+#                             print('->' + way, end='')
+#                         print('  (共{}站）'.format(len(way1) + len(way2)))
+#
+#     print()
 
 # 导航
-def Navigation1(station1,station2):
-    naviline=''
-    naviline+=station1+'到'+station2+'轨道交通路线：\n'
-    l1=GetLineId(station1)
-    l2 = GetLineId(station2)
-    for ll1 in l1:
-        for ll2 in l2:
-            if ll1==ll2:
-                way1 = GoToWay(ll1, station1, station2)
-                naviline+="地铁" + str(ll1) + '号线:'
-                for way in way1:
-                    naviline +='->' + way
-                naviline+='(共{}站）'.format(len(way1))+'\n'
-            else:
-                transferstation=GetTransfer(ll1,ll2)
-                for tfs in transferstation:
-                    way1 = GoToWay(ll1, station1, tfs)
-                    way2 = GoToWay(ll2, tfs, station2)
-                    if(way1 and way2):
-                        naviline+=('地铁' + str(ll1) + '号线:')
-                        for way in way1:
-                            naviline+='->' + way
+# def Navigation1(station1,station2):
+#     naviline=''
+#     naviline+=station1+'到'+station2+'轨道交通路线：\n'
+#     l1=GetLineId(station1)
+#     l2 = GetLineId(station2)
+#     for ll1 in l1:
+#         for ll2 in l2:
+#             if ll1==ll2:
+#                 way1 = GoToWay(ll1, station1, station2)
+#                 naviline+="地铁" + str(ll1) + '号线:'
+#                 for way in way1:
+#                     naviline +='->' + way
+#                 naviline+='(共{}站）'.format(len(way1))+'\n'
+#             else:
+#                 transferstation=GetTransfer(ll1,ll2)
+#                 for tfs in transferstation:
+#                     way1 = GoToWay(ll1, station1, tfs)
+#                     way2 = GoToWay(ll2, tfs, station2)
+#                     if(way1 and way2):
+#                         naviline+=('地铁' + str(ll1) + '号线:')
+#                         for way in way1:
+#                             naviline+='->' + way
+#
+#                         naviline+='(此站换乘)-> '
+#                         naviline += "地铁" + str(ll2) + '号线:'
+#                         for i, way in enumerate(way2):
+#                             naviline += '->' + way
+#                         naviline += '  (共{}站）'.format(len(way1) + len(way2)) + '\n'
+#
+#
+#
+#     return naviline
 
-                        naviline+='(此站换乘)-> '
-                        naviline += "地铁" + str(ll2) + '号线:'
-                        for i, way in enumerate(way2):
-                            naviline += '->' + way
-                        naviline += '  (共{}站）'.format(len(way1) + len(way2)) + '\n'
 
 
 
-    return naviline
+# 获得路线图
+def getrailgraph():
+    rail={}
+    graph={}
+    cnxn = sqllink()
+    cursor = cnxn.cursor()
+    cursor.execute('''select LineId,StationId from Rail''')
+    for row in cursor:
+        rail.setdefault(row[0], []).append(row[1])
+    for k in range(1, len(rail)+1):
+        for i in range(0, len(rail[k]) - 1):
+            graph.setdefault(rail[k][i], []).append([rail[k][i + 1], k])
+            graph.setdefault(rail[k][i + 1], []).append([rail[k][i], k])
+    return graph
 
+#BFS
+def BFS(graph, s, e):  # graph图  s指的是开始结点
+    qianqunode = {}
+    queue = []
+    queue.append(s)
+    seen = set()  # 看是否访问过该结点
+    seen.add(s)
+    while (len(queue)):
+        vertex = queue.pop(0)  # 保存第一结点，并弹出，方便把他下面的子节点接入
+        nodes = graph[vertex]  # 子节点的数组
+        for w in nodes:
+            if w[0] not in seen:  # 判断是否访问过，使用一个数组
+                queue.append(w[0])
+                qianqunode[w[0]] = [vertex, w[1]]
+                seen.add(w[0])
+                if (w[0] == e):
+                    print()
+
+    return qianqunode
+
+#前驱结点回溯
+def printnode(s, e, l,qianqunode):
+    dict=GetStationIdToName()
+    if (e != s):
+        printnode(s, qianqunode[e][0], qianqunode[e][1],qianqunode)
+    print(dict[e], l)
+
+#bfs导航，最短路径
+def Navigation(ststion1,station2):
+    graph=getrailgraph()
+    startid=GetStationId(ststion1)
+    endid=GetStationId(station2)
+    q=BFS(graph, startid, endid)
+    printnode(startid,endid,0,q)
 
 
 def main():
