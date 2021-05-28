@@ -54,9 +54,18 @@ buttonstyle1='''
 '''
 # font = QtGui.QFont()
 # font.setFamily('宋体')
-labelstyle1='background:rgb(255, 255 ,255,80);font: 25px;font-family:KaiTi'
+labelstyle1='background:rgb(202,225,255,80);font: 25px;font-family:KaiTi'
 labelstyle2='QLabel{color:rgb(28,28,28,255);font-size:40px;font-weight:normal;font-family:Microsoft Yahei;}'
+labelstyle3='background:rgb(255,255,255,10);font: 25px;font-family:KaiTi'
 
+
+QComboBoxstyle1='''
+                QComboBox {border:none;background:rgb(202,225,255,80);color:#000000;
+                padding-left:30px;font-size:15px "SimHei";}
+                QComboBox QAbstractItemView { padding-left:30px;} 
+                QComboBox QAbstractItemView:item { min-height: 100px; }
+                QComboBox::drop-down {border:30px ;width: 20px;}
+                '''
 
 
 

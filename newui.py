@@ -20,11 +20,20 @@ class childwindow(QDialog):
     def initUI(self):
         self.setWindowTitle('路线导航')
         self.resize(600,600)
+        palette = QPalette()
+        pix = QtGui.QPixmap('line4.jpg')
+        pix = pix.scaled(self.width(), self.height())
+        palette.setBrush(QPalette.Background, QBrush(QPixmap(pix)))
+        self.setPalette(palette)
 
         self.startcomboline = QComboBox()
         self.endcomboline = QComboBox()
         self.startcombosation = QComboBox()
         self.endcombostation = QComboBox()
+        self.startcomboline.setStyleSheet(beautify.QComboBoxstyle1)
+        self.startcombosation.setStyleSheet(beautify.QComboBoxstyle1)
+        self.endcomboline.setStyleSheet(beautify.QComboBoxstyle1)
+        self.endcombostation.setStyleSheet(beautify.QComboBoxstyle1)
 
         allline=getalllinename()#获得所有路线
         for line in allline:
@@ -44,11 +53,11 @@ class childwindow(QDialog):
 
         btnstrat = QPushButton('&导航')
         btnCancel = QPushButton('&取消')
-        btnstrat.setStyleSheet(beautify.qss)
-        btnCancel.setStyleSheet(beautify.qss)
+        btnstrat.setStyleSheet(beautify.buttonstyle1)
+        btnCancel.setStyleSheet(beautify.buttonstyle1)
         self.navilabel=QLabel("   ...")
         self.navilabel.setWordWrap(True)
-        self.navilabel.setStyleSheet(beautify.labelstyle1)
+        self.navilabel.setStyleSheet(beautify.labelstyle3)
 
         mainLayout = QGridLayout(self)
         mainLayout.addWidget(startlabel, 0, 0)
@@ -71,8 +80,15 @@ class childwindow(QDialog):
         if(starts=='' or ends==''):
             self.navilabel.setText("请同时选择起始站和终点站")
             return
-        naviline=Navigation1(starts, ends)
-        self.navilabel.setText(naviline)
+        s=''
+        Navigation(starts, ends)
+        nowline=0
+        for way in utilsnaviway:
+            if way[1]!=nowline and way[1]!=0:
+                nowline=way[1]
+                s+=way[0]+'(轨道交通'+str(nowline)+'号线)'+'->  '
+        s+=ends
+        self.navilabel.setText(s)
 
     def updatestartcombosation1(self):
         self.startcombosation.clear()
@@ -156,12 +172,13 @@ class mainwindow(QWidget):
         grid.addWidget(button_cardgo, 2, 3)
         # grid.addWidget(QLabel(), 0, 4)
 
-        answerlabel=QLabel("   ...")
-        answerlabel.setWordWrap(True)#label实现自动换行
-        # answerlabel.setAlignment(QtCore.Qt.AlignTop)
-        answerlabel.resize(200, 100)
+        self.answerlabel=QLabel("   ...")
+        self.answerlabel.setStyleSheet(beautify.labelstyle3)
+        self.answerlabel.setWordWrap(True)#label实现自动换行
+        # self.answerlabel.setAlignment(QtCore.Qt.AlignTop)
+        self.answerlabel.resize(200, 100)
         # vlayout2.addStretch(1)
-        vlayout2.addWidget(answerlabel)
+        vlayout2.addWidget(self.answerlabel)
         # vlayout2.addStretch(1)
 
 
@@ -173,25 +190,25 @@ class mainwindow(QWidget):
         wlayout.addLayout(vlayout2)
 
         self.setLayout(wlayout)#写这句保持相对布局
-        button_station.clicked.connect(lambda:self.getstation(answerlabel))
-        button_line.clicked.connect(lambda:self.getline(answerlabel))
+        button_station.clicked.connect(self.getstation)
+        button_line.clicked.connect(self.getline)
         button_navi.clicked.connect(self.getnavi)
         # button_cardgenerate.clicked.connect(self.getstation)
         # button_cardquery.clicked.connect(self.getstation)
         # button_cardgo.clicked.connect(self.getstation)
         self.show()
-    def getstation(self,label):
+    def getstation(self):
         txt, ok = QInputDialog.getText(self, '输入框', '输入查询站点')
         if ok and txt:
             l = Station_inquiry(txt)
-            label.setText('通过'+txt+'的轨道交通线有:\n'+l)
+            self.answerlabel.setText('通过'+txt+'的轨道交通线有:\n'+l)
 
     def getline(self,label):
         txt, ok = QInputDialog.getText(self, '输入框', '输入查询路线')
         if ok and txt:
             l = Line_inquiry(int(txt))
             s = strline(l)
-        label.setText('轨道交通' + txt + '号线站点:\n' + s)
+            self.answerlabel.setText('轨道交通' + txt + '号线站点:\n' + s)
 
     def getnavi(self):
         console = childwindow()

@@ -8,7 +8,7 @@ import PyQt5
 # for row in cursor:
 #     print(row)
 
-
+utilsnaviway=[]
 #数据库连接
 def sqllink():
     cnxn_str = ('Driver={SQL Server};'
@@ -237,7 +237,7 @@ def printnode(s, e, l,qianqunode):
     dict=GetStationIdToName()
     if (e != s):
         printnode(s, qianqunode[e][0], qianqunode[e][1],qianqunode)
-    print(dict[e], l)
+    utilsnaviway.append([dict[e], l])
 
 #bfs导航，最短路径
 def Navigation(ststion1,station2):
@@ -245,6 +245,7 @@ def Navigation(ststion1,station2):
     startid=GetStationId(ststion1)
     endid=GetStationId(station2)
     q=BFS(graph, startid, endid)
+    utilsnaviway.clear()
     printnode(startid,endid,0,q)
 
 
