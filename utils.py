@@ -27,6 +27,15 @@ def getalllinename():
         l.append(stt)
     return l
 
+def GetLineNameToId():
+    dict = {}
+    cnxn = sqllink()
+    cursor = cnxn.cursor()
+    cursor.execute('''select LineId,LineName from Line''')
+    for row in cursor:
+        dict[row[1]] = row[0]
+    return dict
+
 #站点查询
 def Station_inquiry(station):
     l=''
@@ -102,103 +111,18 @@ def GetStationIdToName():
         dict[row[0]]=row[1]
     return dict
 
-# 得到换乘站
-def GetTransfer(l1,l2):
-    transferstation = []
-    cnxn = sqllink()
-    cursor = cnxn.cursor()
-    cursor.execute('''select StationName
-                      from TransferStation
-                    where (LineA=? and LineB=?)or(LineA=? and LineB=?)''', l1, l2, l2, l1)
-    for row in cursor:
-        transferstation.append(row[0])
-    return transferstation
-
-# 从A到B
-def GoToWay(line,station1,station2):
-    way=[]
-    StationList = Line_inquiry(line)
-    start = [i for i in range(0, len(StationList)) if StationList[i] == station1]
-    end = [i for i in range(0, len(StationList)) if StationList[i] == station2]
-    if (start < end):
-        for i in range(start[0], end[0]+1):
-            way.append(StationList[i])
-    if (start > end):
-        for i in range(start[0] , end[0] - 1,-1):
-            way.append(StationList[i])
-    return way
-
-# 导航+打印
-# def Navigation(station1,station2):
-#     print(station1+'到'+station2+'轨道交通路线：')
-#     l1=GetLineId(station1)
-#     l2 = GetLineId(station2)
-#     for ll1 in l1:
-#         for ll2 in l2:
-#             if ll1==ll2:
-#                 way1 = GoToWay(ll1, station1, station2)
-#                 print("地铁" + str(ll1) + '号线:', end='')
-#                 for way in way1:
-#                     print('->' + way, end='')
-#                 print('(共{}站）'.format(len(way1)))
-#             else:
-#                 transferstation=GetTransfer(ll1,ll2)
-#                 for tfs in transferstation:
-#                     if(tfs!=station1):
-#                         way1 = GoToWay(ll1, station1, tfs)
-#                         print("地铁" + str(ll1) + '号线:', end='')
-#                         for way in way1:
-#                             print('->' + way, end='')
-#
-#                         print('(此站换乘)-> ', end='')
-#
-#                         way2 = GoToWay(ll2, tfs, station2)
-#                         print("地铁" + str(ll2) + '号线:', end='')
-#                         for i, way in enumerate(way2):
-#                             print('->' + way, end='')
-#                         print('  (共{}站）'.format(len(way1) + len(way2)))
-#
-#     print()
-
-# 导航
-# def Navigation1(station1,station2):
-#     naviline=''
-#     naviline+=station1+'到'+station2+'轨道交通路线：\n'
-#     l1=GetLineId(station1)
-#     l2 = GetLineId(station2)
-#     for ll1 in l1:
-#         for ll2 in l2:
-#             if ll1==ll2:
-#                 way1 = GoToWay(ll1, station1, station2)
-#                 naviline+="地铁" + str(ll1) + '号线:'
-#                 for way in way1:
-#                     naviline +='->' + way
-#                 naviline+='(共{}站）'.format(len(way1))+'\n'
-#             else:
-#                 transferstation=GetTransfer(ll1,ll2)
-#                 for tfs in transferstation:
-#                     way1 = GoToWay(ll1, station1, tfs)
-#                     way2 = GoToWay(ll2, tfs, station2)
-#                     if(way1 and way2):
-#                         naviline+=('地铁' + str(ll1) + '号线:')
-#                         for way in way1:
-#                             naviline+='->' + way
-#
-#                         naviline+='(此站换乘)-> '
-#                         naviline += "地铁" + str(ll2) + '号线:'
-#                         for i, way in enumerate(way2):
-#                             naviline += '->' + way
-#                         naviline += '  (共{}站）'.format(len(way1) + len(way2)) + '\n'
-#
-#
-#
-#     return naviline
-
-
-
+#获取有哪些路线，例如1,3,8,11
+def GetAllrailline():
+    l = []
+    cnxn = sqllink();
+    st = pd.read_sql('''select distinct LineId from Rail''', cnxn)
+    for stt in st["LineId"]:
+        l.append(int(stt))
+    return l
 
 # 获得路线图
 def getrailgraph():
+    railline=GetAllrailline()#获取有哪些路线，例如1,3,8,11
     rail={}
     graph={}
     cnxn = sqllink()
@@ -206,7 +130,7 @@ def getrailgraph():
     cursor.execute('''select LineId,StationId from Rail''')
     for row in cursor:
         rail.setdefault(row[0], []).append(row[1])
-    for k in range(1, len(rail)+1):
+    for k in railline:
         for i in range(0, len(rail[k]) - 1):
             graph.setdefault(rail[k][i], []).append([rail[k][i + 1], k])
             graph.setdefault(rail[k][i + 1], []).append([rail[k][i], k])

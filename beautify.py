@@ -33,22 +33,23 @@ buttonstyle1='''
                      text-align : center;
                      background: rgb(255,255,255,180);
                      font: bold;
+                     font-family:'KaiTi';
                      border-color: gray;
                      border-width: 2px;
                      border-radius: 10px;
                      padding: 6px;
-                     height : 14px;
+                     height : 25px;
                      border-style: outset;
-                     font : 15px;}
+                     font : 23px;}
                      QPushButton:hover{
                      font: bold;
                      border: 1px solid Gray;
-                     background:rgb(202,225,255,80);
+                     background:rgb(202,225,255,100);
                     }
                     QPushButton:pressed{
                     font: bold;
                     border: 2px solid DarkGray;
-                    background:rgb(202,225,255, 100);
+                    background:rgb(202,225,255, 120);
                     }
 
 '''

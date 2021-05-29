@@ -19,6 +19,7 @@ class childwindow(QDialog):
 
     def initUI(self):
         self.setWindowTitle('路线导航')
+        self.setWindowIcon(QIcon('yong.jpg'))
         self.resize(600,600)
         palette = QPalette()
         pix = QtGui.QPixmap('line4.jpg')
@@ -93,14 +94,16 @@ class childwindow(QDialog):
     def updatestartcombosation1(self):
         self.startcombosation.clear()
         s=self.startcomboline.currentText()
-        l = Line_inquiry(int(s[4]))
+        dict = GetLineNameToId()
+        l = Line_inquiry(int(dict[s]))
         for i in range(0, len(l)):
             self.startcombosation.addItem(l[i])
 
     def updatestartcombosation2(self):
         self.endcombostation.clear()
         s=self.endcomboline.currentText()
-        l = Line_inquiry(int(s[4]))
+        dict = GetLineNameToId()
+        l = Line_inquiry(int(dict[s]))
         for i in range(0, len(l)):
             self.endcombostation.addItem(l[i])
 
@@ -203,12 +206,14 @@ class mainwindow(QWidget):
             l = Station_inquiry(txt)
             self.answerlabel.setText('通过'+txt+'的轨道交通线有:\n'+l)
 
-    def getline(self,label):
-        txt, ok = QInputDialog.getText(self, '输入框', '输入查询路线')
-        if ok and txt:
-            l = Line_inquiry(int(txt))
+    def getline(self):
+        items=getalllinename()
+        dict=GetLineNameToId()
+        item, okPressed = QInputDialog.getItem(self, "Get item", "线路:", items, 0, False)
+        if okPressed and item:
+            l = Line_inquiry(int(dict[item]))
             s = strline(l)
-            self.answerlabel.setText('轨道交通' + txt + '号线站点:\n' + s)
+            self.answerlabel.setText(item + '站点:\n' + s)
 
     def getnavi(self):
         console = childwindow()
