@@ -9,9 +9,14 @@ from PyQt5.QtGui import *
 from PyQt5.QtWidgets import (QWidget, QGridLayout,
                              QPushButton, QApplication, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QInputDialog,QDialog,QLineEdit,QComboBox)
 from PyQt5.QtGui import QIcon
+from PyQt5.QtCore import QUrl
+from PyQt5.QtGui import QDesktopServices
 import sys
 from utils import *
 import beautify
+import webbrowser
+from PyQt5.QtWebEngineWidgets import QWebEngineView
+
 class childwindow(QDialog):
     def __init__(self):
         super().__init__()
@@ -19,10 +24,10 @@ class childwindow(QDialog):
 
     def initUI(self):
         self.setWindowTitle('路线导航')
-        self.setWindowIcon(QIcon('yong.jpg'))
+        self.setWindowIcon(QIcon('Icon/yong.jpg'))
         self.resize(600,600)
         palette = QPalette()
-        pix = QtGui.QPixmap('line4.jpg')
+        pix = QtGui.QPixmap('Icon/linepic.jpg')
         pix = pix.scaled(self.width(), self.height())
         palette.setBrush(QPalette.Background, QBrush(QPixmap(pix)))
         self.setPalette(palette)
@@ -115,13 +120,16 @@ class mainwindow(QWidget):
 
         self.initUI()
     def initUI(self):
-
+        # QDesktopServices.openUrl(QUrl("user1/User1.html"))
+        # browser = QWebEngineView()
+        # browser.load(QUrl("user1/User1.html"))
+        # browser.show()
         # self.setFixedSize(self.width(), self.height());#不能放大
         self.setWindowTitle('宁波轨道交通')
-        self.setWindowIcon(QIcon('yong.jpg'))
+        self.setWindowIcon(QIcon('Icon/yong.jpg'))
         self.resize(600,600)
         palette = QPalette()
-        pix = QtGui.QPixmap('line4.jpg')
+        pix = QtGui.QPixmap('Icon/linepic.jpg')
         pix = pix.scaled(self.width(), self.height())
         palette.setBrush(QPalette.Background, QBrush(QPixmap(pix)))
         self.setPalette(palette)
@@ -129,7 +137,7 @@ class mainwindow(QWidget):
 
         #设置图标
         symbollbl = QLabel(self)
-        pixmap = QPixmap("biaozhi1.png")
+        pixmap = QPixmap("Icon/biaozhi.png")
         pixmap = pixmap.scaled(100, 100)
         symbollbl.setPixmap(pixmap)
 
@@ -142,7 +150,7 @@ class mainwindow(QWidget):
 
         titlelabel=QLabel("宁波轨道交通查询乘车系统\n     Ningbo Rail Transit")
         titlelabel.setStyleSheet(beautify.labelstyle2)
-        # m_Pixmap = QPixmap("yong.jpg")
+        # m_Pixmap = QPixmap("Icon/yong.jpg")
         # titlelabel.setPixmap(m_Pixmap)
 
         # 为局部布局添加控件
@@ -221,9 +229,19 @@ class mainwindow(QWidget):
         console.exec_()
         # lable.setText("1")
 
+class web(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.initUI()
+    def initUI(self):
+        url="user1/User1.html"
+        # QDesktopServices.openUrl(QUrl("user1/User1.html"))
+        webbrowser.open(url, new=0, autoraise=True)
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = mainwindow()
     # ax=childwindow()
     # ax.show()
+    we=web()
     sys.exit(app.exec_())
