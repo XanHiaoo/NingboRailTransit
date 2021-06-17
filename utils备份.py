@@ -12,7 +12,7 @@ import PyQt5
 # cursor.execute("select Station.StationName from Rail inner join Station on Rail.StationId=Station.StationId where LineId=1")
 # for row in cursor:
 #     print(row)
-def sqllink():
+def sqllinkrail():
     cnxn_str = ('Driver={SQL Server};'
                 'Server=LAPTOP-HBNPGUI2;'
                 'Database=NingboRailTransit;'
@@ -21,7 +21,7 @@ def sqllink():
 
 def Station_inquiry(station):
     l=''
-    cnxn = sqllink();
+    cnxn = sqllinkrail();
     st = pd.read_sql('''select StationName
         from Station''', cnxn)
     for stt in st['StationName']:
@@ -37,7 +37,7 @@ def Station_inquiry(station):
         return '没有这个站'
 def Line_inquiry(line):
     l={}
-    cnxn = sqllink()
+    cnxn = sqllinkrail()
     li = pd.read_sql('''select LineId
                         from Line''', cnxn)
     for lii in li['LineId']:
@@ -55,7 +55,7 @@ def Line_inquiry(line):
 
 def GetLineId(station):
     l=[]
-    cnxn = sqllink()
+    cnxn = sqllinkrail()
     cursor = cnxn.cursor()
     cursor.execute('''select Line.LineId
                           from Station inner join Rail on Station.StationId=Rail.StationId inner join Line on Line.LineId=Rail.LineID
@@ -66,7 +66,7 @@ def GetLineId(station):
 
 def GetTransfer(l1,l2):
     transferstation = []
-    cnxn = sqllink()
+    cnxn = sqllinkrail()
     cursor = cnxn.cursor()
     cursor.execute('''select StationName
                       from TransferStation

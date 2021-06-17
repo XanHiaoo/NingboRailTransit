@@ -14,7 +14,7 @@ from utils import *
 import beautify
 
 
-class childwindow(QDialog):
+class childwindownavi(QDialog):
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -331,7 +331,7 @@ class Ui_MainWindow(QMainWindow):
     #     txt1, ok = QInputDialog.getText(self, '输入框', '起始站')
 
     def command(self):
-        self.console = childwindow()
+        self.console = childwindownavi()
         self.console.show()
         self.console.exec_()
 

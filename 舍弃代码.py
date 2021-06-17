@@ -71,7 +71,7 @@
 # 得到换乘站
 def GetTransfer(l1,l2):
     transferstation = []
-    cnxn = sqllink()
+    cnxn = sqllinkrail()
     cursor = cnxn.cursor()
     cursor.execute('''select StationName
                       from TransferStation

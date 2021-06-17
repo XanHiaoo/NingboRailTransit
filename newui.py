@@ -6,8 +6,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtCore import *
 from PyQt5.QtGui import *
-from PyQt5.QtWidgets import (QWidget, QGridLayout,
-                             QPushButton, QApplication, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QInputDialog,QDialog,QLineEdit,QComboBox)
+from PyQt5.QtWidgets import (QWidget, QGridLayout,QTextEdit,
+                             QPushButton, QApplication, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QInputDialog,QDialog,QLineEdit,QComboBox,QFileDialog)
 from PyQt5.QtGui import QIcon
 from PyQt5.QtCore import QUrl
 from PyQt5.QtGui import QDesktopServices
@@ -17,7 +17,8 @@ import beautify
 import webbrowser
 from PyQt5.QtWebEngineWidgets import QWebEngineView
 
-class childwindow(QDialog):
+'''导航界面'''
+class childwindownavi(QDialog):
     def __init__(self):
         super().__init__()
         self.initUI()
@@ -112,8 +113,191 @@ class childwindow(QDialog):
         for i in range(0, len(l)):
             self.endcombostation.addItem(l[i])
 
+'''乘车界面'''
+class childwindowtake(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+
+    def initUI(self):
+        self.setWindowTitle('乘车系统')
+        self.setWindowIcon(QIcon('Icon/yong.jpg'))
+        self.resize(600,600)
+        palette = QPalette()
+        pix = QtGui.QPixmap('Icon/linepic.jpg')
+        pix = pix.scaled(self.width(), self.height())
+        palette.setBrush(QPalette.Background, QBrush(QPixmap(pix)))
+        self.setPalette(palette)
+
+        self.cardid = QLineEdit()
+        self.startcomboline = QComboBox()
+        self.endcomboline = QComboBox()
+        self.startcombosation = QComboBox()
+        self.endcombostation = QComboBox()
+        self.startcomboline.setStyleSheet(beautify.QComboBoxstyle1)
+        self.startcombosation.setStyleSheet(beautify.QComboBoxstyle1)
+        self.endcomboline.setStyleSheet(beautify.QComboBoxstyle1)
+        self.endcombostation.setStyleSheet(beautify.QComboBoxstyle1)
+
+        allline=getalllinename()#获得所有路线
+        for line in allline:
+            self.startcomboline.addItem(line)
+            self.endcomboline.addItem(line)
+
+        self.startcomboline.currentTextChanged.connect(self.updatestartcombosation1)
+        self.endcomboline.currentTextChanged.connect(self.updatestartcombosation2)
+
+        cardidlabel = QLabel('    &卡号:', self)
+        cardidlabel.setBuddy(self.cardid)
+        cardidlabel.setStyleSheet(beautify.labelstyle1)
+
+        startlabel = QLabel('    &起始站:', self)
+        startlabel.setBuddy(self.startcomboline)
+        startlabel.setStyleSheet(beautify.labelstyle1)
+
+        endlabel = QLabel('    &终点站:', self)
+        endlabel.setBuddy(self.endcomboline)
+        endlabel.setStyleSheet(beautify.labelstyle1)
+
+        btnstrat = QPushButton('&开始乘车')
+        btnCancel = QPushButton('&取消')
+        btnstrat.setStyleSheet(beautify.buttonstyle1)
+        btnCancel.setStyleSheet(beautify.buttonstyle1)
+        self.navilabel=QLabel("   ...")
+        self.navilabel.setWordWrap(True)
+        self.navilabel.setStyleSheet(beautify.labelstyle3)
+
+        mainLayout = QGridLayout(self)
+        mainLayout.addWidget(cardidlabel,0,0)
+        mainLayout.addWidget(self.cardid, 0, 1)
+        mainLayout.addWidget(startlabel, 1, 0)
+        mainLayout.addWidget(self.startcomboline, 1, 1 )
+        mainLayout.addWidget(self.startcombosation, 1, 2)
+        mainLayout.addWidget(endlabel, 2, 0)
+        mainLayout.addWidget(self.endcomboline, 2, 1)
+        mainLayout.addWidget(self.endcombostation, 2, 2)
+
+        mainLayout.addWidget(btnstrat, 3, 1)
+        mainLayout.addWidget(btnCancel, 3, 2)
+
+        mainLayout.addWidget(self.navilabel,4,0,1,3)
+
+        btnstrat.clicked.connect(self.start)
+    def start(self):
+        cardnum=self.cardid.text()
+        if(Cardisexist(cardnum)==False):
+            self.navilabel.setText("请输入正确的公交卡号")
+            return
+        starts=self.startcombosation.currentText()
+        ends=self.endcombostation.currentText()
+        if(starts=='' or ends==''):
+            self.navilabel.setText("请同时选择起始站和终点站")
+            return
+        Navigation(starts, ends)
+        waylen=len(utilsnaviway)-1
+        infor=Cardquery(cardnum)
+        s = ''
+        flag=False
+        balance=infor[0][1]
+        if(infor[0][0]==1):
+            cost=waylen*0.5
+            if(cost>balance):
+                s+='公交卡余额不足'
+            else:
+                s = starts + '->' + ends + '（共' + str(waylen) + '站）\n扣费:' + str(waylen * 0.5) + '\n余额：'+str(infor[0][1]-waylen * 0.5)
+                balance-=cost
+                flag=True
+
+        elif (infor[0][0] == 2):
+            cost = waylen * 0.3
+            if(cost>balance):
+                s += '公交卡余额不足'
+            else:
+                s = starts + '->' + ends + '（共' + str(waylen) + '站）\n学生卡扣费:' + str(waylen * 0.3) + '\n余额：' + str(infor[0][1] - waylen * 0.3)
+                balance -= cost
+                flag = True
+        elif (infor[0][0] == 3):
+                s = starts + '->' + ends + '（共' + str(waylen) + '站）\n老人卡免费乘坐'
+                flag = True
+
+        if(flag):
+            UpdateCardRecord(cardnum,balance,starts,ends)
+        self.navilabel.setText(s)
+
+    def updatestartcombosation1(self):
+        self.startcombosation.clear()
+        s=self.startcomboline.currentText()
+        dict = GetLineNameToId()
+        l = Line_inquiry(int(dict[s]))
+        for i in range(0, len(l)):
+            self.startcombosation.addItem(l[i])
+
+    def updatestartcombosation2(self):
+        self.endcombostation.clear()
+        s=self.endcomboline.currentText()
+        dict = GetLineNameToId()
+        l = Line_inquiry(int(dict[s]))
+        for i in range(0, len(l)):
+            self.endcombostation.addItem(l[i])
+
+'''路线管理界面'''
+class filewindow(QDialog):
+
+    def __init__(self):
+        super().__init__()
+
+        self.initUI()
+
+    def initUI(self):
+        self.flag=False
+        self.filename=''
+        self.setWindowTitle('轨道路线管理系统')
+        self.setWindowIcon(QIcon('Icon/yong.jpg'))
+        self.resize(600, 600)
+        palette = QPalette()
+        pix = QtGui.QPixmap('Icon/linepic.jpg')
+        pix = pix.scaled(self.width(), self.height())
+        palette.setBrush(QPalette.Background, QBrush(QPixmap(pix)))
+        self.setPalette(palette)
+        okButton = QPushButton("选择文件")
+        addButton = QPushButton("确认修改")
+        self.textEdit=QTextEdit()
+        hbox = QHBoxLayout()
+        hbox1=QHBoxLayout()
+        hbox.addWidget(self.textEdit)
+        hbox1.addStretch(1)
+        hbox1.addWidget(okButton)
+        hbox1.addWidget(addButton)
 
 
+        vbox = QVBoxLayout()
+        vbox.addLayout(hbox)
+        vbox.addLayout(hbox1)
+        self.setLayout(vbox)
+
+        okButton.clicked.connect(self.showDialog)
+        addButton.clicked.connect(self.addline)
+
+
+    def showDialog(self):
+        fname = QFileDialog.getOpenFileName(self, 'Open file', 'D:\\Users\\16030\\Desktop')
+        if fname[0]:
+            f = open(fname[0], 'r')
+            with f:
+                self.filename=fname[0]
+                data = f.read()
+                self.textEdit.setText(data)
+                self.flag=True
+    def addline(self):
+        if(self.flag):
+            dd = pd.read_csv(self.filename, header=None, encoding="gbk")
+            updateline(dd)
+        else:
+            self.textEdit.setText('请选择文件')
+
+
+
+'''主界面'''
 class mainwindow(QWidget):
     def __init__(self):
         super().__init__()
@@ -127,7 +311,7 @@ class mainwindow(QWidget):
         # self.setFixedSize(self.width(), self.height());#不能放大
         self.setWindowTitle('宁波轨道交通')
         self.setWindowIcon(QIcon('Icon/yong.jpg'))
-        self.resize(600,600)
+        self.resize(800,800)
         palette = QPalette()
         pix = QtGui.QPixmap('Icon/linepic.jpg')
         pix = pix.scaled(self.width(), self.height())
@@ -167,20 +351,20 @@ class mainwindow(QWidget):
         button_line.setStyleSheet(beautify.buttonstyle1)
         button_navi=QPushButton("       导航查询       ")
         button_navi.setStyleSheet(beautify.buttonstyle1)
-        button_cardgenerate=QPushButton("      公交卡办理      ")
-        button_cardgenerate.setStyleSheet(beautify.buttonstyle1)
-        button_cardquery=QPushButton("      公交卡充值      ")
+        button_cardtakeway=QPushButton("      公交卡乘车      ")
+        button_cardtakeway.setStyleSheet(beautify.buttonstyle1)
+        button_cardquery=QPushButton("      公交卡管理      ")
         button_cardquery.setStyleSheet(beautify.buttonstyle1)
-        button_cardgo=QPushButton("      公交卡乘车      ")
-        button_cardgo.setStyleSheet(beautify.buttonstyle1)
+        button_linemanage=QPushButton("      轨道路线管理      ")
+        button_linemanage.setStyleSheet(beautify.buttonstyle1)
         # grid.addWidget(QLabel(), 0, 0)
         grid.addWidget(button_station, 0,1)
         grid.addWidget(button_line, 1, 1)
         grid.addWidget(button_navi, 2, 1)
         # grid.addWidget(QLabel(), 0, 2)
-        grid.addWidget(button_cardgenerate, 0, 3)
+        grid.addWidget(button_cardtakeway, 0, 3)
         grid.addWidget(button_cardquery, 1, 3)
-        grid.addWidget(button_cardgo, 2, 3)
+        grid.addWidget(button_linemanage, 2, 3)
         # grid.addWidget(QLabel(), 0, 4)
 
         self.answerlabel=QLabel("   ...")
@@ -204,9 +388,9 @@ class mainwindow(QWidget):
         button_station.clicked.connect(self.getstation)
         button_line.clicked.connect(self.getline)
         button_navi.clicked.connect(self.getnavi)
-        # button_cardgenerate.clicked.connect(self.getstation)
+        button_cardtakeway.clicked.connect(self.takeway)
         # button_cardquery.clicked.connect(self.getstation)
-        # button_cardgo.clicked.connect(self.getstation)
+        button_linemanage.clicked.connect(self.linemanage)
         self.show()
     def getstation(self):
         txt, ok = QInputDialog.getText(self, '输入框', '输入查询站点')
@@ -224,24 +408,22 @@ class mainwindow(QWidget):
             self.answerlabel.setText(item + '站点:\n' + s)
 
     def getnavi(self):
-        console = childwindow()
+        console = childwindownavi()
         console.show()
         console.exec_()
         # lable.setText("1")
 
-class web(QWidget):
-    def __init__(self):
-        super().__init__()
+    def takeway(self):
+        console = childwindowtake()
+        console.show()
+        console.exec_()
 
-        self.initUI()
-    def initUI(self):
-        url="user1/User1.html"
-        # QDesktopServices.openUrl(QUrl("user1/User1.html"))
-        webbrowser.open(url, new=0, autoraise=True)
+    def linemanage(self):
+        console = filewindow()
+        console.show()
+        console.exec_()
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = mainwindow()
-    # ax=childwindow()
-    # ax.show()
-    we=web()
     sys.exit(app.exec_())
