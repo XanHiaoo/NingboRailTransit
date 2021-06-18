@@ -260,7 +260,9 @@ class filewindow(QDialog):
         palette.setBrush(QPalette.Background, QBrush(QPixmap(pix)))
         self.setPalette(palette)
         okButton = QPushButton("选择文件")
+        okButton.setStyleSheet(beautify.buttonstyle1)
         addButton = QPushButton("确认修改")
+        addButton.setStyleSheet(beautify.buttonstyle1)
         self.textEdit=QTextEdit()
         hbox = QHBoxLayout()
         hbox1=QHBoxLayout()
@@ -292,10 +294,9 @@ class filewindow(QDialog):
         if(self.flag):
             dd = pd.read_csv(self.filename, header=None, encoding="gbk")
             updateline(dd)
+            self.textEdit.setText('路线修改成功')
         else:
             self.textEdit.setText('请选择文件')
-
-
 
 '''主界面'''
 class mainwindow(QWidget):

@@ -327,7 +327,6 @@ def updateline(data):
         if(i not in l):
             count+=1
             lnew.append((count,i))
-    print(lnew)
     for station in lnew:
         cursor = cnxn.cursor()
         cursor.execute('''insert into Station VALUES (?,?) ''', station[0],station[1])
