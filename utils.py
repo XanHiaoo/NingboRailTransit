@@ -19,7 +19,7 @@ utilsnaviway=[]
 def sqllinkrail():
     cnxn_str = ('Driver={SQL Server};'
                 'Server=LAPTOP-HBNPGUI2;'
-                'Database=NingboRailTransit;'
+                'Database=NingboRailTransitTest;'
                 'Trusted_Connection=yes;')
     return pyodbc.connect(cnxn_str)
 
@@ -264,13 +264,13 @@ def Navigation(ststion1,station2):
 参数:
 返回:
 '''
-def UpdateCardRecord(card,balance,s,e):
+def UpdateCardRecord(card,balance,cost,s,e):
     cnxn = sqllinkcard();
     cursor = cnxn.cursor()
     cursor.execute('''UPDATE Card SET Balance = ? WHERE CardNumber = ? ''', balance,card)
     waystr=''
     waystr=s+'->'+e
-    cursor.execute('''INSERT INTO CardRecord VALUES (?,?,(select CONVERT(varchar, getdate(), 120 )))''',card,waystr)
+    cursor.execute('''INSERT INTO CardRecord VALUES (?,?,(select CONVERT(varchar, getdate(), 120 )),?)''',card,waystr,cost)
     cnxn.commit()
     return
 
@@ -319,6 +319,16 @@ def updateline(data):
     l=[]
     lnew=[]
     cnxn = sqllinkrail()
+    cursor = cnxn.cursor()
+    cursor.execute(
+        '''select isnull((select top(1) 1 from Line where LineId=?), 0)''', int(data[0][1]))
+    for row in cursor:
+        flag = row[0]
+    if (flag == 0):
+        linename = '轨道交通' + str(data[0][1]) + '号线'
+        cursor = cnxn.cursor()
+        cursor.execute('''insert into Line values(?,?)''', int(data[0][1]), linename)
+        cnxn.commit()
     linedata = pd.read_sql("select * from Station", cnxn)
     count=len(linedata)
     for i in linedata['StationName']:
@@ -336,10 +346,7 @@ def updateline(data):
         cursor = cnxn.cursor()
         cursor.execute('''insert into Rail (LineId,StationId) VALUES (?,(select StationId from Station where StationName=?))''',int(data[0][1]),i)
         cnxn.commit()
-    linename='轨道交通'+str(data[0][1])+'号线'
-    cursor = cnxn.cursor()
-    cursor.execute('''insert into Line values(?,?)''',int(data[0][1]), linename)
-    cnxn.commit()
+
 
 
 def main():

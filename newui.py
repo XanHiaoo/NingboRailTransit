@@ -16,6 +16,7 @@ from utils import *
 import beautify
 import webbrowser
 from PyQt5.QtWebEngineWidgets import QWebEngineView
+import win32api 
 
 '''导航界面'''
 class childwindownavi(QDialog):
@@ -26,7 +27,7 @@ class childwindownavi(QDialog):
     def initUI(self):
         self.setWindowTitle('路线导航')
         self.setWindowIcon(QIcon('Icon/yong.jpg'))
-        self.resize(600,600)
+        self.resize(900,900)
         palette = QPalette()
         pix = QtGui.QPixmap('Icon/linepic.jpg')
         pix = pix.scaled(self.width(), self.height())
@@ -122,7 +123,7 @@ class childwindowtake(QDialog):
     def initUI(self):
         self.setWindowTitle('乘车系统')
         self.setWindowIcon(QIcon('Icon/yong.jpg'))
-        self.resize(600,600)
+        self.resize(900,900)
         palette = QPalette()
         pix = QtGui.QPixmap('Icon/linepic.jpg')
         pix = pix.scaled(self.width(), self.height())
@@ -130,6 +131,7 @@ class childwindowtake(QDialog):
         self.setPalette(palette)
 
         self.cardid = QLineEdit()
+        self.cardid.setMaxLength(6)
         self.startcomboline = QComboBox()
         self.endcomboline = QComboBox()
         self.startcombosation = QComboBox()
@@ -182,6 +184,8 @@ class childwindowtake(QDialog):
 
         mainLayout.addWidget(self.navilabel,4,0,1,3)
 
+
+
         btnstrat.clicked.connect(self.start)
     def start(self):
         cardnum=self.cardid.text()
@@ -199,6 +203,7 @@ class childwindowtake(QDialog):
         s = ''
         flag=False
         balance=infor[0][1]
+        cost=0
         if(infor[0][0]==1):
             cost=waylen*0.5
             if(cost>balance):
@@ -221,7 +226,7 @@ class childwindowtake(QDialog):
                 flag = True
 
         if(flag):
-            UpdateCardRecord(cardnum,balance,starts,ends)
+            UpdateCardRecord(cardnum,balance,cost,starts,ends)
         self.navilabel.setText(s)
 
     def updatestartcombosation1(self):
@@ -312,7 +317,7 @@ class mainwindow(QWidget):
         # self.setFixedSize(self.width(), self.height());#不能放大
         self.setWindowTitle('宁波轨道交通')
         self.setWindowIcon(QIcon('Icon/yong.jpg'))
-        self.resize(800,800)
+        self.resize(900,900)
         palette = QPalette()
         pix = QtGui.QPixmap('Icon/linepic.jpg')
         pix = pix.scaled(self.width(), self.height())
@@ -354,8 +359,8 @@ class mainwindow(QWidget):
         button_navi.setStyleSheet(beautify.buttonstyle1)
         button_cardtakeway=QPushButton("      公交卡乘车      ")
         button_cardtakeway.setStyleSheet(beautify.buttonstyle1)
-        button_cardquery=QPushButton("      公交卡管理      ")
-        button_cardquery.setStyleSheet(beautify.buttonstyle1)
+        button_cardmanage=QPushButton("      公交卡管理      ")
+        button_cardmanage.setStyleSheet(beautify.buttonstyle1)
         button_linemanage=QPushButton("      轨道路线管理      ")
         button_linemanage.setStyleSheet(beautify.buttonstyle1)
         # grid.addWidget(QLabel(), 0, 0)
@@ -364,7 +369,7 @@ class mainwindow(QWidget):
         grid.addWidget(button_navi, 2, 1)
         # grid.addWidget(QLabel(), 0, 2)
         grid.addWidget(button_cardtakeway, 0, 3)
-        grid.addWidget(button_cardquery, 1, 3)
+        grid.addWidget(button_cardmanage, 1, 3)
         grid.addWidget(button_linemanage, 2, 3)
         # grid.addWidget(QLabel(), 0, 4)
 
@@ -390,7 +395,7 @@ class mainwindow(QWidget):
         button_line.clicked.connect(self.getline)
         button_navi.clicked.connect(self.getnavi)
         button_cardtakeway.clicked.connect(self.takeway)
-        # button_cardquery.clicked.connect(self.getstation)
+        button_cardmanage.clicked.connect(self.cardexe)
         button_linemanage.clicked.connect(self.linemanage)
         self.show()
     def getstation(self):
@@ -423,6 +428,9 @@ class mainwindow(QWidget):
         console = filewindow()
         console.show()
         console.exec_()
+
+    def cardexe(self):
+        win32api.ShellExecute(0, 'open', 'CardClient-win32-x64\\CardClient.exe', '', '', 1)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
